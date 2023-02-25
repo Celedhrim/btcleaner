@@ -70,7 +70,7 @@ func main() {
 	if viper.GetString("config") != "" {
 		viper.SetConfigFile(viper.GetString("config"))
 	} else {
-		viper.AddConfigPath("~/.config")
+		viper.AddConfigPath("$HOME/.config")
 		viper.AddConfigPath(".")
 		viper.SetConfigName("btcleaner") // Register config file name (no extension)
 		viper.SetConfigType("yaml")      // Look for specific type
