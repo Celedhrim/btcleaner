@@ -1,11 +1,8 @@
-name: builrelease
+name: Build release binaries
 
 on:
   release:
     types: [created]
-
-permissions:
-  contents: write
 
 jobs:
   releases-matrix:

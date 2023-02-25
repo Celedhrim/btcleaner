@@ -134,12 +134,8 @@ func main() {
 
 	// Count torrent per tracker
 	torrentPerTracker := make(map[string]int)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-	} else {
-		for _, torrent := range torrents {
-			torrentPerTracker[url2domain(torrent.Trackers[0].Announce)]++
-		}
+	for _, torrent := range torrents {
+		torrentPerTracker[url2domain(torrent.Trackers[0].Announce)]++
 	}
 
 	// iterate to select torrent to drop
