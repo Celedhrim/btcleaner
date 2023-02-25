@@ -1,6 +1,11 @@
+name: builrelease
+
 on:
   release:
     types: [created]
+
+permissions:
+  contents: write
 
 jobs:
   releases-matrix:
