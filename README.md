@@ -1,6 +1,6 @@
 # btcleaner
 
-Keep a minimum free space on your Transmission daemon whilme ensure a minimumm torrentper tracker to need being inactive.
+Keep a minimum free space on your Transmission daemon while ensure a minimumm torrents per tracker to not being flag inactive.
 
 ## Configuration
 
