@@ -12,6 +12,7 @@ import (
 	"github.com/hekmon/transmissionrpc/v2"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"golang.org/x/exp/slices"
 )
 
 var (
@@ -84,6 +85,7 @@ func main() {
 	conf_path := viper.GetString("path")
 	conf_freegiga := viper.GetInt("free_giga")
 	conf_trackerkeep := viper.GetInt("tracker_keep")
+	conf_exclude := viper.GetStringSlice("exclude")
 	conf_cron := viper.GetBool("cron")
 	conf_do := viper.GetBool("do")
 
@@ -141,7 +143,9 @@ func main() {
 	// iterate to select torrent to drop
 	for _, torrent := range torrents {
 		thisTracker := url2domain(torrent.Trackers[0].Announce)
-		if torrentPerTracker[thisTracker] > conf_trackerkeep {
+		if slices.Contains(conf_exclude, *torrent.Name) {
+			fmt.Println("Excluded because on exclude list:", *torrent.Name)
+		} else if torrentPerTracker[thisTracker] > conf_trackerkeep {
 			toDrop = append(toDrop, *torrent.ID)
 			torrentPerTracker[thisTracker]--
 			spaceRecovered = spaceRecovered + *torrent.SizeWhenDone
@@ -150,7 +154,7 @@ func main() {
 				break
 			}
 		} else {
-			fmt.Println("Excluded because only", torrentPerTracker[thisTracker], "torrents left on ", thisTracker, ": ", *torrent.Name)
+			fmt.Println("Excluded because only", torrentPerTracker[thisTracker], "torrents left on ", thisTracker, ":", *torrent.Name)
 		}
 	}
 

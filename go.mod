@@ -7,6 +7,7 @@ require (
 	github.com/hekmon/transmissionrpc/v2 v2.0.1 // direct
 	github.com/spf13/pflag v1.0.5 // direct
 	github.com/spf13/viper v1.15.0 // direct
+	golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2 // direct
 )
 
 require (
