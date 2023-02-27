@@ -16,6 +16,10 @@ transmission:
 path: "/path/to/download/dir"
 free_giga: 100
 tracker_keep: 2
+
+exclude:
+  - torrent name
+  - another torrent name
 ```
 
 ## Usage
