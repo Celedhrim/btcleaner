@@ -144,7 +144,9 @@ func main() {
 	for _, torrent := range torrents {
 		thisTracker := url2domain(torrent.Trackers[0].Announce)
 		if slices.Contains(conf_exclude, *torrent.Name) {
-			fmt.Println("Excluded because on exclude list:", *torrent.Name)
+			if !conf_cron {
+				fmt.Println("Excluded because on exclude list:", *torrent.Name)
+			}
 		} else if torrentPerTracker[thisTracker] > conf_trackerkeep {
 			toDrop = append(toDrop, *torrent.ID)
 			torrentPerTracker[thisTracker]--
@@ -154,7 +156,9 @@ func main() {
 				break
 			}
 		} else {
-			fmt.Println("Excluded because only", torrentPerTracker[thisTracker], "torrents left on ", thisTracker, ":", *torrent.Name)
+			if !conf_cron {
+				fmt.Println("Excluded because only", torrentPerTracker[thisTracker], "torrents left on ", thisTracker, ":", *torrent.Name)
+			}
 		}
 	}
 
