@@ -7,11 +7,7 @@ Keep a minimum free space on your Transmission daemon while ensure a minimumm to
 Create a config file like this in ~/config/btcleaner.yaml
 
 ```yaml
-transmission:
-  host: "127.0.0.1"
-  port: 9091
-  user: "user"
-  pass: "password"
+transmission_url: "http://user:password@127.0.0.1:9091/transmission/rpc"
 
 path: "/path/to/download/dir"
 free_giga: 100
