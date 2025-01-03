@@ -1,8 +1,4 @@
-transmission:
-  host: "127.0.0.1"
-  port: 9091
-  user: "user"
-  pass: "pass"
+transmission_url: "http://user:password@127.0.0.1:9091/transmission/rpc"
 
 path: "/home/seedbox/download"
 free_giga: 100

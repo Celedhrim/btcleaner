@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/hekmon/cunits/v2"
-	"github.com/hekmon/transmissionrpc/v2"
+	"github.com/hekmon/transmissionrpc/v3"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/slices"
@@ -38,10 +38,7 @@ func url2domain(fullurl string) string {
 
 func main() {
 
-	viper.SetDefault("transmission.host", "127.0.0.1")
-	viper.SetDefault("transmission.port", "9091")
-	viper.SetDefault("transmission.user", "username")
-	viper.SetDefault("transmission.pass", "password")
+	viper.SetDefault("transmission_url", "http://user:password@127.0.0.1:9091/transmission/rpc")
 	viper.SetDefault("path", "/")
 	viper.SetDefault("free_giga", 250)
 	viper.SetDefault("tracker_keep", 2)
@@ -78,10 +75,7 @@ func main() {
 	}
 	viper.ReadInConfig()
 
-	conf_host := viper.GetString("transmission.host")
-	conf_port := viper.GetUint16("transmission.port")
-	conf_user := viper.GetString("transmission.user")
-	conf_pass := viper.GetString("transmission.pass")
+	conf_url := viper.GetString("transmission_url")
 	conf_path := viper.GetString("path")
 	conf_freegiga := viper.GetInt("free_giga")
 	conf_trackerkeep := viper.GetInt("tracker_keep")
@@ -97,14 +91,11 @@ func main() {
 	// Get wanted space in cunits
 	targetSpace, _ := cunits.Parse(fmt.Sprint(conf_freegiga) + " GiB")
 
-	// Instanciate Transmission connection
-	transmissionbt, _ := transmissionrpc.New(conf_host, conf_user, conf_pass,
-		&transmissionrpc.AdvancedConfig{
-			Port: conf_port,
-		})
+	endpoint, _ := url.Parse(conf_url)
+	transmissionbt, _ := transmissionrpc.New(endpoint, nil)
 
 	// Get Free space
-	freeSpace, err := transmissionbt.FreeSpace(context.TODO(), conf_path)
+	freeSpace, _, err := transmissionbt.FreeSpace(context.TODO(), conf_path)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -170,7 +161,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		freeSpace, err := transmissionbt.FreeSpace(context.TODO(), conf_path)
+		freeSpace, _, err := transmissionbt.FreeSpace(context.TODO(), conf_path)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.0
+ * Update mods
+ * breaking change on config , now transmission config is put has an url
+
 ## v0.2.1
  * Don't display excluded torrent in cron mode
 
