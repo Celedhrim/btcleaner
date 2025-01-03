@@ -1,6 +1,8 @@
 module github.com/Celedhrim/btcleaner
 
-go 1.23
+go 1.22.0
+
+toolchain go1.23.4
 
 require (
 	github.com/hekmon/cunits/v2 v2.1.0 // direct
