@@ -2,8 +2,6 @@ module github.com/Celedhrim/btcleaner
 
 go 1.23
 
-toolchain go1.23.4
-
 require (
 	github.com/hekmon/cunits/v2 v2.1.0 // direct
 	github.com/spf13/pflag v1.0.5 // direct
