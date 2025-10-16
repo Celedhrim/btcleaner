@@ -17,12 +17,12 @@ jobs:
             goos: windows
     steps:
     - uses: actions/checkout@v3
-    - uses: wangyoucao577/go-release-action@v1.35
+    - uses: wangyoucao577/go-release-action@v1.53
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
-        goversion: "1.22"
+        goversion: "1.23"
         md5sum: FALSE
         compress_assets: OFF
         ldflags: -X "main.version=${{ github.event.release.name }}"
