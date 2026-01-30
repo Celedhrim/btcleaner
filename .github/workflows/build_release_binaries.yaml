@@ -27,31 +27,13 @@ jobs:
         compress_assets: OFF
         ldflags: -X "main.Version=${{ github.event.release.tag_name }}"
 
-  release-armv6:
-    name: Release Go Binary for ARMv6
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: wangyoucao577/go-release-action@v1.53
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        goos: 'linux'
-        goarch: 'arm'
-        goarm: '6'
-        goversion: "1.25"
-        project_path: "./cmd/btcleaner"
-        binary_name: "btcleaner"
-        md5sum: FALSE
-        compress_assets: OFF
-        ldflags: -X "main.Version=${{ github.event.release.tag_name }}"
-
   publish-docker:
     name: Build and Publish Docker image
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-    needs: [releases-matrix, release-armv6]
+    needs: [releases-matrix]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
