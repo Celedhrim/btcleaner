@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  btcleaner:
+    image: ghcr.io/celedhrim/btcleaner:latest
+    # Uncomment to build locally instead of pulling from registry:
+    # build: .
+    container_name: btcleaner
+    restart: unless-stopped
+    
+    environment:
+      # Transmission connection settings
+      # URL to Transmission RPC endpoint
+      BTCLEANER_TRANSMISSION_URL: "http://transmission:9091/transmission/rpc"
+      # Transmission username (leave empty if no auth)
+      BTCLEANER_TRANSMISSION_USERNAME: ""
+      # Transmission password (leave empty if no auth)
+      BTCLEANER_TRANSMISSION_PASSWORD: ""
+      
+      # Cleaner settings
+      # Minimum free space threshold (supports units: GB, MB, KB, or raw bytes)
+      # Examples: "100GB", "500MB", "1024"
+      BTCLEANER_CLEANER_MIN_FREE_SPACE: "100GB"
+      # Minimum number of torrents to keep per tracker
+      BTCLEANER_CLEANER_MIN_TORRENTS_PER_TRACKER: "2"
+      
+      # Server (Web UI) settings
+      # Enable web UI server
+      BTCLEANER_SERVER_ENABLED: "false"
+      # Web UI port
+      BTCLEANER_SERVER_PORT: "8888"
+      # Web UI root path (for reverse proxy support)
+      # Default: "/" - Example for reverse proxy: "/btcleaner"
+      BTCLEANER_SERVER_WEBROOT: "/"
+      
+      # Daemon mode settings
+      # Enable daemon mode (continuous monitoring)
+      BTCLEANER_DAEMON_ENABLED: "false"
+      # Check interval in daemon mode (e.g., "1m", "5m", "1h")
+      BTCLEANER_DAEMON_CHECK_INTERVAL: "1m"
+      
+      # Application settings
+      # Dry run mode - simulate actions without actually deleting torrents
+      BTCLEANER_DRY_RUN: "false"
+      # Log level (debug, info, warn, error)
+      BTCLEANER_LOG_LEVEL: "info"
+    
+    # Expose web UI port if enabled
+    ports:
+      - "8888:8888"
+    
+    # Optional: mount config file instead of using environment variables
+    # volumes:
+    #   - ./config.yaml:/etc/btcleaner.yaml:ro
+    
+    # Optional: network configuration
+    # networks:
+    #   - transmission_network
+
+# Optional: define networks
+# networks:
+#   transmission_network:
+#     external: true

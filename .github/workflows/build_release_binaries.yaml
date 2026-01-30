@@ -1,5 +1,3 @@
-name: Build release binaries
-
 on:
   release:
     types: [created]
@@ -11,18 +9,84 @@ jobs:
     strategy:
       matrix:
         goos: [linux, windows, darwin]
-        goarch: [amd64, arm64]
+        goarch: [amd64, arm64, arm]
         exclude:
           - goarch: arm64
             goos: windows
+          - goarch: arm
+            goos: windows
+          - goarch: arm
+            goos: darwin
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: wangyoucao577/go-release-action@v1.53
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
-        goversion: "1.23"
+        goversion: "1.25"
+        project_path: "./cmd/btcleaner"
+        binary_name: "btcleaner"
         md5sum: FALSE
         compress_assets: OFF
-        ldflags: -X "main.version=${{ github.event.release.name }}"
+        ldflags: -X "main.Version=${{ github.event.release.tag_name }}"
+
+  release-armv6:
+    name: Release Go Binary for ARMv6
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: wangyoucao577/go-release-action@v1.53
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        goos: 'linux'
+        goarch: 'arm'
+        goarm: '6'
+        goversion: "1.25"
+        project_path: "./cmd/btcleaner"
+        binary_name: "btcleaner"
+        md5sum: FALSE
+        compress_assets: OFF
+        ldflags: -X "main.Version=${{ github.event.release.tag_name }}"
+
+  publish-docker:
+    name: Build and Publish Docker image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    needs: [releases-matrix, release-armv6]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=raw,value=latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64,linux/arm/v6,linux/arm/v7
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

@@ -1,0 +1,34 @@
+# BTCleaner Configuration File
+
+# Transmission settings
+transmission:
+  url: "http://localhost:9091/transmission/rpc"
+  username: ""
+  password: ""
+
+# Cleaner settings
+cleaner:
+  # Minimum free space (can use units: GB, MB, KB, or raw bytes)
+  # Examples: "100GB", "500MB", "1024", 107374182400
+  min_free_space: "100GB"
+  # Minimum torrents to keep per tracker
+  min_torrents_per_tracker: 2
+
+# Web UI settings (not yet implemented in P0)
+server:
+  enabled: false
+  port: 8888
+  # Webroot for reverse proxy (default: "/", example for reverse proxy: "/btcleaner")
+  webroot: "/"
+
+# Daemon mode settings
+daemon:
+  enabled: false
+  # Check interval (e.g., "1m", "5m", "1h")
+  check_interval: "1m"
+
+# Dry run mode (simulate only, don't delete)
+dry_run: false
+
+# Log level (debug, info, warn, error)
+log_level: "info"

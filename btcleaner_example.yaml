@@ -1,9 +1,0 @@
-transmission_url: "http://user:password@127.0.0.1:9091/transmission/rpc"
-
-path: "/home/seedbox/download"
-free_giga: 100
-tracker_keep: 2
-
-exclude:
-  - torrent name
-  - another torrent name
