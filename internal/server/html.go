@@ -4,6 +4,10 @@ import "strings"
 
 // generateHTML generates the embedded HTML for the web interface
 func (s *Server) generateHTML(webRoot string) string {
+	version := s.version
+	if version == "" {
+		version = "dev"
+	}
 	html := `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,6 +45,18 @@ func (s *Server) generateHTML(webRoot string) string {
         header h1 {
             font-size: 28px;
             font-weight: 600;
+        }
+
+        header .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .version {
+            font-size: 12px;
+            opacity: 0.7;
+            font-weight: 400;
         }
 
         header p {
@@ -347,8 +363,13 @@ func (s *Server) generateHTML(webRoot string) string {
 <body>
     <header>
         <div class="container">
-            <h1>🧹 BTCleaner Dashboard</h1>
-            <p>Automatic Transmission Seedbox Cleanup</p>
+            <div class="header-content">
+                <div>
+                    <h1>🧹 BTCleaner Dashboard</h1>
+                    <p>Automatic Transmission Seedbox Cleanup</p>
+                </div>
+                <div class="version">` + version + `</div>
+            </div>
         </div>
     </header>
 

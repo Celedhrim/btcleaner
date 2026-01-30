@@ -1,5 +1,16 @@
 # Changelog
 
+## v1.0.1 (2026-01-30)
+
+### 🐛 Bug Fixes
+- **Configuration priority**: Fixed configuration precedence order to properly respect CLI flags > environment variables > config file. Previously, config file values would override environment variables when a config file was present.
+
+### ✨ Enhancements
+- **Version display in logs**: Application version now displayed in startup log message (`BTCleaner <version> starting...`)
+- **Version display in dashboard**: Added version information in the dashboard header (top right corner)
+
+---
+
 ## v1.0.0 - Complete Rewrite (2026-01-30)
 
 **Major version** - Complete rewrite with extensive new features and breaking changes.
@@ -113,11 +124,8 @@ log_level: "info"
 ### 📚 Documentation
 - Comprehensive README with examples
 - Quick start guide (QUICKSTART.md)
-- Implementation details (P0_IMPLEMENTATION.md, P1_IMPLEMENTATION.md)
 - Nginx configuration guide (NGINX.md)
 - Example configurations
-
----
 
 ## v0.3.0
  * Update mods

@@ -240,30 +240,6 @@ INFO[0002] Removing torrent: [tracker.example.com] Ubuntu 20.04 LTS (4.52 GB)
 
 Set log level with `-l debug` for detailed information.
 
-## Roadmap
-
-### ✅ Phase P0 (MVP) - COMPLETED
-- CLI interface with flags
-- Configuration system (file, env, CLI)
-- Transmission API client
-- Disk space monitoring
-- Smart torrent selection
-- Daemon and one-shot modes
-- Dry-run mode
-- Docker support
-
-### 🚧 Phase P1 (In Progress)
-- Web UI with dashboard
-- Real-time log viewing
-- Manual torrent deletion
-- Statistics and graphs
-
-### 📋 Phase P2 (Planned)
-- Unit tests (>70% coverage)
-- Notifications (webhooks, Discord, Slack)
-- Prometheus metrics
-- Advanced filtering rules
-
 ## Requirements
 
 - Go 1.25+ (for building)
