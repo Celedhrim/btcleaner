@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.0.2 (2026-01-30)
+
+### 🐛 Bug Fixes
+- **Docker version**: Fixed Docker container version to display correct release version instead of "dev". Added VERSION build argument to Dockerfile and updated GitHub workflow to pass release tag during Docker build.
+
+---
+
 ## v1.0.1 (2026-01-30)
 
 ### 🐛 Bug Fixes
