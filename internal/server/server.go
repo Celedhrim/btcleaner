@@ -21,6 +21,7 @@ import (
 type Server struct {
 	port        int
 	webRoot     string
+	version     string
 	cleaner     *cleaner.Cleaner
 	client      *transmission.Client
 	logger      *logger.Logger
@@ -31,7 +32,7 @@ type Server struct {
 }
 
 // New creates a new server instance
-func New(port int, webRoot string, cleaner *cleaner.Cleaner, client *transmission.Client, log *logger.Logger) *Server {
+func New(port int, webRoot string, version string, cleaner *cleaner.Cleaner, client *transmission.Client, log *logger.Logger) *Server {
 	if !strings.HasPrefix(webRoot, "/") {
 		webRoot = "/" + webRoot
 	}
@@ -42,6 +43,7 @@ func New(port int, webRoot string, cleaner *cleaner.Cleaner, client *transmissio
 	return &Server{
 		port:       port,
 		webRoot:    webRoot,
+		version:    version,
 		cleaner:    cleaner,
 		client:     client,
 		logger:     log,

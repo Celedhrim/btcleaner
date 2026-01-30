@@ -39,7 +39,7 @@ func run() error {
 		return fmt.Errorf("failed to initialize logger: %w", err)
 	}
 
-	log.Info("BTCleaner starting...")
+	log.Infof("BTCleaner %s starting...", Version)
 	log.Infof("Transmission URL: %s", cfg.Transmission.URL)
 	log.Infof("Min free space: %.2f GB", float64(cfg.Cleaner.MinFreeSpace)/(1024*1024*1024))
 	log.Infof("Min torrents per tracker: %d", cfg.Cleaner.MinTorrentsPerTracker)
@@ -74,7 +74,7 @@ func run() error {
 	// Start web server if enabled
 	var webServer *server.Server
 	if cfg.Server.Enabled {
-		webServer = server.New(cfg.Server.Port, cfg.Server.WebRoot, clean, client, log)
+		webServer = server.New(cfg.Server.Port, cfg.Server.WebRoot, Version, clean, client, log)
 		// Connect logger to server for WebSocket broadcasting
 		log.SetCallback(func(entry logger.LogEntry) {
 			webServer.BroadcastLog(entry)

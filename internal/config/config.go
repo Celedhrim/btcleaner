@@ -95,6 +95,7 @@ func parseSize(s string) (int64, error) {
 }
 
 // Load loads configuration from file, environment variables, and CLI flags
+// Priority order (highest to lowest): CLI flags > Environment variables > Config file > Defaults
 func Load(version string) (*Config, error) {
 	// Set defaults
 	viper.SetDefault("transmission.url", "http://localhost:9091/transmission/rpc")
@@ -131,18 +132,93 @@ func Load(version string) (*Config, error) {
 		os.Exit(0)
 	}
 
-	// Bind flags to viper
-	viper.BindPFlag("transmission.url", pflag.Lookup("transmission-url"))
-	viper.BindPFlag("transmission.username", pflag.Lookup("transmission-user"))
-	viper.BindPFlag("transmission.password", pflag.Lookup("transmission-pass"))
-	viper.BindPFlag("daemon.enabled", pflag.Lookup("daemon"))
-	viper.BindPFlag("daemon.check_interval", pflag.Lookup("check-interval"))
-	viper.BindPFlag("dry_run", pflag.Lookup("dry-run"))
-	viper.BindPFlag("server.enabled", pflag.Lookup("web-ui"))
-	viper.BindPFlag("server.port", pflag.Lookup("web-port"))
-	viper.BindPFlag("server.webroot", pflag.Lookup("web-root"))
-	viper.BindPFlag("log_level", pflag.Lookup("log-level"))
+	// STEP 1: Load config file first (lowest priority)
+	configFile := pflag.Lookup("config").Value.String()
+	if configFile != "" {
+		// User specified a config file
+		viper.SetConfigFile(configFile)
+		if err := viper.ReadInConfig(); err != nil {
+			return nil, fmt.Errorf("error reading config file %s: %w", configFile, err)
+		}
+	} else {
+		// Try multiple config file locations in order
+		configPaths := []string{
+			"./btcleaner.yaml",
+			"./config.yaml",
+			os.ExpandEnv("$HOME/.config/btcleaner.yaml"),
+			"/etc/btcleaner.yaml",
+		}
+		
+		for _, path := range configPaths {
+			if _, err := os.Stat(path); err == nil {
+				viper.SetConfigFile(path)
+				if err := viper.ReadInConfig(); err != nil {
+					return nil, fmt.Errorf("error reading config file %s: %w", path, err)
+				}
+				break
+			}
+		}
+		// Config file is optional, so don't error if not found
+	}
 
+	// STEP 2: Apply environment variables (medium priority) - they override config file values
+	viper.SetEnvPrefix("BTCLEANER")
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	
+	// Manually bind environment variables for proper override
+	envVars := map[string]string{
+		"BTCLEANER_TRANSMISSION_URL":                "transmission.url",
+		"BTCLEANER_TRANSMISSION_USERNAME":           "transmission.username",
+		"BTCLEANER_TRANSMISSION_PASSWORD":           "transmission.password",
+		"BTCLEANER_CLEANER_MIN_FREE_SPACE":          "cleaner.min_free_space",
+		"BTCLEANER_CLEANER_MIN_TORRENTS_PER_TRACKER": "cleaner.min_torrents_per_tracker",
+		"BTCLEANER_SERVER_ENABLED":                  "server.enabled",
+		"BTCLEANER_SERVER_PORT":                     "server.port",
+		"BTCLEANER_SERVER_WEBROOT":                  "server.webroot",
+		"BTCLEANER_DAEMON_ENABLED":                  "daemon.enabled",
+		"BTCLEANER_DAEMON_CHECK_INTERVAL":           "daemon.check_interval",
+		"BTCLEANER_DRY_RUN":                         "dry_run",
+		"BTCLEANER_LOG_LEVEL":                       "log_level",
+	}
+	
+	for envVar, configKey := range envVars {
+		if val := os.Getenv(envVar); val != "" {
+			viper.Set(configKey, val)
+		}
+	}
+
+	// STEP 3: Apply CLI flags (highest priority) - they override everything
+	if pflag.Lookup("transmission-url").Changed {
+		viper.Set("transmission.url", pflag.Lookup("transmission-url").Value.String())
+	}
+	if pflag.Lookup("transmission-user").Changed {
+		viper.Set("transmission.username", pflag.Lookup("transmission-user").Value.String())
+	}
+	if pflag.Lookup("transmission-pass").Changed {
+		viper.Set("transmission.password", pflag.Lookup("transmission-pass").Value.String())
+	}
+	if pflag.Lookup("daemon").Changed {
+		viper.Set("daemon.enabled", pflag.Lookup("daemon").Value.String())
+	}
+	if pflag.Lookup("check-interval").Changed {
+		viper.Set("daemon.check_interval", pflag.Lookup("check-interval").Value.String())
+	}
+	if pflag.Lookup("dry-run").Changed {
+		viper.Set("dry_run", pflag.Lookup("dry-run").Value.String())
+	}
+	if pflag.Lookup("web-ui").Changed {
+		viper.Set("server.enabled", pflag.Lookup("web-ui").Value.String())
+	}
+	if pflag.Lookup("web-port").Changed {
+		viper.Set("server.port", pflag.Lookup("web-port").Value.String())
+	}
+	if pflag.Lookup("web-root").Changed {
+		viper.Set("server.webroot", pflag.Lookup("web-root").Value.String())
+	}
+	if pflag.Lookup("log-level").Changed {
+		viper.Set("log_level", pflag.Lookup("log-level").Value.String())
+	}
+	
 	// Handle min-free-space (convert GB to bytes)
 	if pflag.Lookup("min-free-space").Changed {
 		gb := pflag.Lookup("min-free-space").Value.String()
@@ -160,45 +236,6 @@ func Load(version string) (*Config, error) {
 			var mtInt int
 			fmt.Sscanf(mt, "%d", &mtInt)
 			viper.Set("cleaner.min_torrents_per_tracker", mtInt)
-		}
-	}
-
-	// Environment variables
-	viper.SetEnvPrefix("BTCLEANER")
-	viper.AutomaticEnv()
-
-	// Config file
-	configFile := pflag.Lookup("config").Value.String()
-	if configFile != "" {
-		// User specified a config file
-		viper.SetConfigFile(configFile)
-		if err := viper.ReadInConfig(); err != nil {
-			return nil, fmt.Errorf("error reading config file %s: %w", configFile, err)
-		}
-	} else {
-		// Try multiple config file locations in order
-		configPaths := []string{
-			"./btcleaner.yaml",
-			"./config.yaml",
-			os.ExpandEnv("$HOME/.config/btcleaner.yaml"),
-			"/etc/btcleaner.yaml",
-		}
-		
-		configLoaded := false
-		for _, path := range configPaths {
-			if _, err := os.Stat(path); err == nil {
-				viper.SetConfigFile(path)
-				if err := viper.ReadInConfig(); err != nil {
-					return nil, fmt.Errorf("error reading config file %s: %w", path, err)
-				}
-				configLoaded = true
-				break
-			}
-		}
-		
-		// Config file is optional, so don't error if not found
-		if !configLoaded {
-			// No config file found, use defaults
 		}
 	}
 
