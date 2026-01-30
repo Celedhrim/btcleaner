@@ -1,0 +1,7 @@
+btcleaner
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
+config.yaml
